@@ -90,13 +90,13 @@ function AccordionSection({ title, items }: { title: string; items: string[] }) 
   );
 }
 
-export default function Footer() {
-  const { ref, visible } = useScrollReveal<HTMLElement>();
+export default function Footer({ enableFadeIn = true }: { enableFadeIn?: boolean }) {
+  const { ref, visible } = useScrollReveal<HTMLElement>({ enabled: enableFadeIn });
 
   return (
     <footer
       ref={ref}
-      className={`relative overflow-hidden border-t border-brand-gold/30 bg-[#3D0C0C] px-6 pt-16 pb-8 sm:px-10 transition-all duration-500 ease-out ${revealClass(visible)}`}
+      className={`relative overflow-hidden border-t border-brand-gold/30 bg-[#3D0C0C] px-6 pt-16 pb-8 sm:px-10 ${enableFadeIn ? `transition-all duration-500 ease-out ${revealClass(visible)}` : ''}`}
     >
       <div className="pointer-events-none absolute -right-20 bottom-0 font-display text-[16rem] leading-none text-brand-gold/[0.03]" aria-hidden="true">優</div>
 

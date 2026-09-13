@@ -22,7 +22,7 @@ export default function IntroductionPage() {
       <FeaturedStudentsSection sectionId="thanh-tich-hoc-vien" enableFadeIn={false} />
       <ExtracurricularSection />
       <CtaSection enableFadeIn={false} />
-      <Footer />
+      <Footer enableFadeIn={false} />
     </div>
   );
 }

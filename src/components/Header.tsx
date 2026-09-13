@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { Menu, Phone, X, ChevronDown } from 'lucide-react';
 
 const navLinks = [
-  { label: 'Khóa Học', href: '#khoa-hoc' },
   { label: 'Chi Nhánh', href: '#chi-nhanh' },
   { label: 'Thư Viện', href: '#thu-vien' },
 ];
@@ -14,12 +13,22 @@ const introSubLinks = [
   { label: 'Hoạt Động Ngoại Khóa', href: '/gioi-thieu#hoat-dong-ngoai-khoa' },
 ];
 
+const courseSubLinks = [
+  { label: 'Khóa Luyện Thi HSK/HSKK', href: '/khoa-hoc/luyen-thi-hsk-hskk' },
+  { label: 'Khóa Doanh Nghiệp', href: '/khoa-hoc/doanh-nghiep' },
+  { label: 'Hán Ngữ Tích Hợp 3.0 Trực Tuyến', href: '/khoa-hoc/han-ngu-tich-hop-truc-tuyen' },
+  { label: 'Khóa Tiếng Trung Trẻ Em', href: '/khoa-hoc/tre-em' },
+];
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [introDropdownOpen, setIntroDropdownOpen] = useState(false);
+  const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false);
   const [mobileIntroOpen, setMobileIntroOpen] = useState(false);
-  const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mobileCoursesOpen, setMobileCoursesOpen] = useState(false);
+  const introTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const coursesTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -30,21 +39,31 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const openIntroDropdown = () => {
+    if (introTimeout.current) clearTimeout(introTimeout.current);
+    setIntroDropdownOpen(true);
+  };
+
+  const closeIntroDropdown = () => {
+    introTimeout.current = setTimeout(() => setIntroDropdownOpen(false), 150);
+  };
+
+  const openCoursesDropdown = () => {
+    if (coursesTimeout.current) clearTimeout(coursesTimeout.current);
+    setCoursesDropdownOpen(true);
+  };
+
+  const closeCoursesDropdown = () => {
+    coursesTimeout.current = setTimeout(() => setCoursesDropdownOpen(false), 150);
+  };
+
   const scrollToTop = () => {
-    if (window.location.pathname.startsWith('/gioi-thieu')) {
+    const path = window.location.pathname;
+    if (path !== '/' && !path.startsWith('/#')) {
       window.location.href = '/';
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
-
-  const openDropdown = () => {
-    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
-    setDropdownOpen(true);
-  };
-
-  const closeDropdown = () => {
-    dropdownTimeout.current = setTimeout(() => setDropdownOpen(false), 150);
   };
 
   return (
@@ -78,11 +97,11 @@ export default function Header() {
           </button>
 
           <nav className="hidden items-center justify-self-center gap-8 md:flex">
-            {/* Giới Thiệu with mega-menu dropdown */}
+            {/* Giới Thiệu with dropdown */}
             <div
               className="relative"
-              onMouseEnter={openDropdown}
-              onMouseLeave={closeDropdown}
+              onMouseEnter={openIntroDropdown}
+              onMouseLeave={closeIntroDropdown}
             >
               <a
                 href="/gioi-thieu"
@@ -90,15 +109,14 @@ export default function Header() {
               >
                 Giới Thiệu
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${introDropdownOpen ? 'rotate-180' : ''}`}
                 />
                 <span className="absolute -bottom-1.5 left-0 h-px w-0 bg-brand-gold transition-all duration-300 ease-out group-hover:w-full" />
               </a>
 
-              {/* Dropdown panel */}
               <div
                 className={`absolute left-1/2 top-full -translate-x-1/2 pt-3 transition-all duration-200 ${
-                  dropdownOpen
+                  introDropdownOpen
                     ? 'visible translate-y-0 opacity-100'
                     : 'invisible -translate-y-2 opacity-0'
                 }`}
@@ -106,6 +124,48 @@ export default function Header() {
                 <div className="mx-auto h-3 w-3 -translate-y-1.5 rotate-45 border-l border-t border-brand-gold bg-brand-cream" />
                 <div className="relative -mt-1.5 w-56 rounded-lg border border-brand-gold bg-brand-cream py-2 shadow-xl shadow-black/20">
                   {introSubLinks.map((sub) => (
+                    <a
+                      key={sub.href}
+                      href={sub.href}
+                      className="group flex items-center border-l-2 border-transparent px-4 py-2.5 font-sans text-sm text-brand-red transition-all duration-200 hover:border-brand-gold hover:bg-brand-gold/10 hover:text-brand-gold-deep"
+                    >
+                      {sub.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Khóa Học — dropdown only, no direct navigation */}
+            <div
+              className="relative"
+              onMouseEnter={openCoursesDropdown}
+              onMouseLeave={closeCoursesDropdown}
+            >
+              <button
+                type="button"
+                onClick={(e) => e.preventDefault()}
+                className="group relative flex cursor-pointer items-center gap-1 font-sans text-sm text-white transition-colors duration-200 hover:text-brand-gold focus:text-brand-gold"
+                aria-haspopup="true"
+                aria-expanded={coursesDropdownOpen}
+              >
+                Khóa Học
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${coursesDropdownOpen ? 'rotate-180' : ''}`}
+                />
+                <span className="absolute -bottom-1.5 left-0 h-px w-0 bg-brand-gold transition-all duration-300 ease-out group-hover:w-full" />
+              </button>
+
+              <div
+                className={`absolute left-1/2 top-full -translate-x-1/2 pt-3 transition-all duration-200 ${
+                  coursesDropdownOpen
+                    ? 'visible translate-y-0 opacity-100'
+                    : 'invisible -translate-y-2 opacity-0'
+                }`}
+              >
+                <div className="mx-auto h-3 w-3 -translate-y-1.5 rotate-45 border-l border-t border-brand-gold bg-brand-cream" />
+                <div className="relative -mt-1.5 w-64 rounded-lg border border-brand-gold bg-brand-cream py-2 shadow-xl shadow-black/20">
+                  {courseSubLinks.map((sub) => (
                     <a
                       key={sub.href}
                       href={sub.href}
@@ -187,6 +247,34 @@ export default function Header() {
               {mobileIntroOpen && (
                 <div className="flex flex-col gap-0.5 pb-1 pl-4">
                   {introSubLinks.map((sub) => (
+                    <a
+                      key={sub.href}
+                      href={sub.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="border-b border-white/5 py-2 font-sans text-sm text-white/80 transition-colors duration-200 last:border-0 hover:text-brand-gold focus:text-brand-gold"
+                    >
+                      {sub.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Khóa Học accordion */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setMobileCoursesOpen(!mobileCoursesOpen)}
+                className="flex w-full items-center justify-between border-b border-white/5 py-2.5 font-sans text-sm text-white transition-colors duration-200 hover:text-brand-gold focus:text-brand-gold"
+                aria-expanded={mobileCoursesOpen}
+              >
+                Khóa Học
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-300 ${mobileCoursesOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+              {mobileCoursesOpen && (
+                <div className="flex flex-col gap-0.5 pb-1 pl-4">
+                  {courseSubLinks.map((sub) => (
                     <a
                       key={sub.href}
                       href={sub.href}
